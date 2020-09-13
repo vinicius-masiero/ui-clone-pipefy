@@ -41,11 +41,14 @@
         "tsx": "never"
       }
     ],
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off"
   },
   "settings": {
     "import/resolver": {
       "typescript": {}
-    }
+    },
+    "react": { "version": "detect" }
   }
 }
