@@ -1,10 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useContext } from 'react';
 import { useDrag, useDrop,  } from 'react-dnd';
+
+import BoardContext from '../Board/context';
 
 import { Container, Label } from './styles';
 
 export interface CardProps {
   index?: number;
+  listIndex?: number;
   id: number;
   content: string;
   labels: string[];
@@ -13,14 +16,16 @@ export interface CardProps {
 
 interface DragItem {
   type: string;
-  index: number;
+  index: number | string;
+  listIndex: number | undefined;
 }
 
-const Card: React.FC<CardProps> = ({ index, id, content, labels, user }) => {
+const Card: React.FC<CardProps> = ({ index, listIndex, content, labels, user }) => {
   const ref = useRef();
+  const { move } = useContext(BoardContext as any);
 
   const [{ isDragging }, dragRef] = useDrag({
-    item: { type: 'CARD', index },
+    item: { type: 'CARD', index, listIndex },
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
@@ -29,8 +34,33 @@ const Card: React.FC<CardProps> = ({ index, id, content, labels, user }) => {
   const [, dropRef] = useDrop({
     accept: 'CARD',
     hover(item: DragItem, monitor) {
-      console.log(item.index);
-      console.log(index);
+      const draggedListIndex = item.listIndex;
+      const targetListIndex = listIndex;
+
+      const draggedIndex = item.index;
+      const targetIndex = index? index : '';
+
+      if (draggedIndex === targetIndex && draggedListIndex === targetListIndex) {
+        return;
+      }
+
+      const targetSize = (ref.current as any).getBoundingClientRect();
+      const targetCenter = (targetSize.bottom - targetSize.top) / 2;
+
+      const draggedOffset = monitor.getClientOffset();
+      const draggedTop = draggedOffset? draggedOffset.y - targetSize.top : '';
+
+      if (draggedIndex < targetIndex && draggedTop < targetCenter) {
+        return;
+      }
+      if (draggedIndex > targetIndex && draggedTop > targetCenter) {
+        return;
+      }
+
+      move(draggedListIndex, targetListIndex, draggedIndex, targetIndex);
+
+      item.index = targetIndex;
+      item.listIndex = targetListIndex;
     }
   });
 

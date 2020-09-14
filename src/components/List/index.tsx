@@ -7,13 +7,14 @@ import Card, { CardProps } from '../Card';
 import { Container } from './styles';
 
 interface ListProps {
+  index: number;
   title: string;
   creatable: boolean;
   cards: CardProps[];
   done: boolean;
 }
 
-const List: React.FC<ListProps> = ({ title, creatable, cards, done }) => {
+const List: React.FC<ListProps> = ({ index: listIndex, title, creatable, cards, done }) => {
   return (
     <Container done={done}>
       <header>
@@ -26,7 +27,7 @@ const List: React.FC<ListProps> = ({ title, creatable, cards, done }) => {
       </header>
 
       <ul>
-        {cards.map((card, index) => <Card key={card.id} index={index} id={card.id} content={card.content} labels={card.labels} user={card.user} />)}
+        {cards.map((card, index) => <Card key={card.id} listIndex={listIndex} index={index} id={card.id} content={card.content} labels={card.labels} user={card.user} />)}
       </ul>
     </Container>
   );
